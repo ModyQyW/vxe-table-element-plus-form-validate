@@ -1,0 +1,23 @@
+{
+  "name": "vxe-table-element-plus-form-validate",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "element-plus": "^2.5.5",
+    "vue": "^3.4.15",
+    "vxe-table": "^4.5.18"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vue-tsc": "^1.8.27"
+  },
+  "packageManager": "pnpm@8.15.1"
+}
