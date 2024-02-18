@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormRules, FormInstance } from "element-plus";
+import { type VxeTableInstance } from "vxe-table";
+
+const vxeTableRef = ref<VxeTableInstance>();
 
 // 伪造下拉选择框数据
 const selectOptions = Array.from({ length: 20 }).map((_, index) => ({
@@ -61,15 +64,40 @@ const handleAdd = () => {
   formModel.value.data.unshift({ ...INITIAL_ITEM });
 };
 
-// 校验
-const handleValidate = async () => {
+// ElForm 校验
+const handleFormValidate = async () => {
   if (!formRef.value) return false;
   return await formRef.value.validate().catch(() => false);
 };
+// 自定义校验
+const handleCustomValidate = () => {
+  const item = formModel.value.data.find(
+    (item) =>
+      !item.field1 ||
+      !item.field2 ||
+      !item.field3 ||
+      !item.field4 ||
+      !item.field5 ||
+      !item.field6
+  ) as Record<string, any> | undefined;
+  return {
+    isValid: !item,
+    data: item,
+  };
+};
 // 提交
-const handleSubmit = async () => {
-  const isValid = await handleValidate();
-  if (!isValid) return ElMessage.error("Invalid");
+const handleSubmit = () => {
+  const { isValid, data } = handleCustomValidate();
+  // 存在错误
+  if (!isValid) {
+    if (vxeTableRef.value) {
+      // _X_ROW_KEY 是 vxe-table 附加的字段
+      vxeTableRef.value.scrollToRow(data?._X_ROW_KEY ?? data);
+      // 调用 ElForm 校验
+      nextTick(() => handleFormValidate());
+    }
+    return ElMessage.error("Invalid");
+  }
   ElMessage.success("Valid");
   // 略过实际提交逻辑
 };
@@ -88,6 +116,7 @@ const handleSubmit = async () => {
     </el-form-item>
     <!-- 表格 -->
     <vxe-table
+      ref="vxeTableRef"
       max-height="512px"
       :scroll-y="{ enabled: true, gt: 0, scrollToTopOnChange: true }"
       :row-config="{ isHover: true, height: 72 }"
